@@ -7,13 +7,9 @@
 
 import SwiftUI
 
-// MARK: - TodayReminder
-
 struct TodayReminder: View {
-    // The source of truth (inject from App entry or parent view)
     @EnvironmentObject var store: PlantStore
 
-    // Add sheet control + draft fields
     @State private var showAddSheet = false
     @State private var draftName = ""
     @State private var draftRoom: Room = .bedroom
@@ -21,23 +17,19 @@ struct TodayReminder: View {
     @State private var draftDays: WateringDays = .everyDay
     @State private var draftWater: Water = .ml20to50
 
-    // Edit sheet control (when user taps a plant name)
     @State private var editingPlant: Plant? = nil
-    // Separate draft for editing so user can cancel without changing the live model
     @State private var editName = ""
     @State private var editRoom: Room = .bedroom
     @State private var editLight: Light = .fullSun
     @State private var editDays: WateringDays = .everyDay
     @State private var editWater: Water = .ml20to50
-
+// MARK: - body
     var body: some View {
         ZStack(alignment: .bottomTrailing) {
-            // Background (replace with your custom color if you have one)
-            Color(.systemBackground).ignoresSafeArea()
+            Color(.background).ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 16) {
 
-                // Title
                 Text("My Plants 🌱")
                     .font(.largeTitle.bold())
                     .padding(.top, 8)
@@ -60,7 +52,8 @@ struct TodayReminder: View {
                             .frame(height: 8)
                     }
                     .padding(.horizontal, 12)
-                    .padding(.top, 14)                    // The scrollable list of plants
+                    .padding(.top, 14)
+                    
                     List {
                         ForEach(store.plants) { plant in
                             PlantRow(
@@ -79,7 +72,6 @@ struct TodayReminder: View {
             .padding(.horizontal, 16)
 
 
-            // Floating + button (always visible)
             Button {
                 beginAdd()
             } label: {
@@ -104,8 +96,7 @@ struct TodayReminder: View {
                 wateringDays: $draftDays,
                 water: $draftWater,
                 onSave: { newPlant in
-                    store.add(newPlant)           // add to list
-                    // Optional: store.scheduleNotifications(for: newPlant)
+                    store.add(newPlant)
                 }
             )
         }
@@ -120,28 +111,23 @@ struct TodayReminder: View {
                 wateringDays: $editDays,
                 water: $editWater,
                 onSave: { updated in
-                    // Preserve ID and dates so we don't lose history
                     var copy = updated
                     copy.id = plant.id
                     copy.lastWateredAt = plant.lastWateredAt
-                    copy.isWatered = plant.isWatered // or recompute from lastWateredAt if you prefer
+                    copy.isWatered = plant.isWatered
 
                     store.update(copy)
-                    // Optional: store.scheduleNotifications(for: copy)
                 },
                 onDelete: {
                     store.remove(id: plant.id)
-                    // Optional: store.cancelNotifications(for: plant.id)
                 }
             )
         }
-        // Keep daily state correct when returning to foreground (optional)
         .onAppear { store.refreshDailyState() }
     }
-    // MARK: - Helpers (draft management)
+    // MARK: - Helpers
 
     private func beginAdd() {
-        // Reset drafts to sensible defaults
         draftName = ""
         draftRoom = .bedroom
         draftLight = .fullSun
@@ -152,7 +138,6 @@ struct TodayReminder: View {
 
     private func beginEditing(_ plant: Plant) {
         editingPlant = plant
-        // Fill drafts from the selected plant
         editName = plant.name
         editRoom = plant.room
         editLight = plant.light
@@ -163,7 +148,6 @@ struct TodayReminder: View {
 
 // MARK: - Row View
 
-//One row in the list: leading checkmark, name (tap to edit), and small badges.
 struct PlantRow: View {
     let plant: Plant
     let onToggle: () -> Void
@@ -182,7 +166,6 @@ struct PlantRow: View {
 
             VStack(alignment: .leading, spacing: 6) {
 
-                // ROOM LINE (above the name)
                 HStack(spacing: 6) {
                     Image(systemName: "location")
                         .font(.caption)
@@ -192,7 +175,6 @@ struct PlantRow: View {
                         .foregroundColor(.grayText)
                 }
 
-                // NAME (tap to edit)
                 Button(action: onTapName) {
                     Text(plant.name)
                         .font(.title3.weight(.semibold))
@@ -201,10 +183,9 @@ struct PlantRow: View {
                 }
                 .buttonStyle(.plain)
 
-                // TAGS: colored sun + water
                 HStack(spacing: 8) {
-                    LightTag(text: plant.light.title)   // yellow-ish
-                    WaterTag(text: plant.water.title)   // blue-ish
+                    LightTag(text: plant.light.title)
+                    WaterTag(text: plant.water.title)
                 }
                 .font(.caption)
             }
@@ -214,7 +195,7 @@ struct PlantRow: View {
     }
 }
 
-// MARK: - Simple Tag Pill
+// MARK: - Tag Pill
 
 struct LightTag: View {
     let text: String
@@ -229,7 +210,7 @@ struct LightTag: View {
             RoundedRectangle(cornerRadius: 12)
                 .fill(Color.sheetBackground)
         )
-        .foregroundColor(.text4Sun) // icon+text tint
+        .foregroundColor(.text4Sun)
     }
 }
 
@@ -252,10 +233,10 @@ struct WaterTag: View {
 }
 
 
-// MARK: - Thick Progress (like your design)
+// MARK: - Progress
 
 struct ThickProgress: View {
-    let value: Double   // expected 0...1
+    let value: Double
 
     var body: some View {
         GeometryReader { geo in
@@ -272,7 +253,7 @@ struct ThickProgress: View {
     }
 }
 
-// MARK: - All Done View
+// MARK: - All Done
 
 struct AllDoneView: View {
     var body: some View {

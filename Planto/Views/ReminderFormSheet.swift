@@ -24,10 +24,9 @@ struct ReminderFormSheet: View {
     var onSave: (Plant) -> Void
     var onDelete: (() -> Void)? = nil
     
-    @Environment(\.dismiss) private var dismiss // Access the environment's dismiss action to close the sheet
+    @Environment(\.dismiss) private var dismiss
     
     @State private var showValidationAlert = false
-    // Checks if plant name is filled
     var canSave: Bool {
         return !plantName.trimmingCharacters(in: .whitespaces).isEmpty
     }
@@ -59,7 +58,6 @@ struct ReminderFormSheet: View {
                         )
                         onSave(newPlant)
 
-                        // 🔔 Schedule a simple local notification 5s after tapping ✓
                         Notification.shared.scheduleIn(
                             seconds: 5,
                             title: "Planto",
@@ -78,7 +76,7 @@ struct ReminderFormSheet: View {
                 }
                 .buttonStyle(.glassProminent)
                 .tint(.greenbutton)
-                .disabled(!canSave) // Disable the button when form is invalid
+                .disabled(!canSave)
             }
             .padding(.top, 10)
 
@@ -88,7 +86,7 @@ struct ReminderFormSheet: View {
                     LabeledContent("Plant Name") {
                         TextField("Pothos", text: $plantName)
                             .textInputAutocapitalization(.words)
-                            .submitLabel(.done) // Show "Done" on the keyboard
+                            .submitLabel(.done)
                     }
                 }
 
@@ -156,7 +154,6 @@ struct ReminderFormSheet: View {
                 }
             }
         }
-        //Alert if name empty
         .alert("Please enter a plant name.", isPresented: $showValidationAlert) {
             Button("OK", role: .cancel) { }
         }

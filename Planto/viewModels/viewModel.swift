@@ -77,7 +77,6 @@ final class PlantStore: ObservableObject {
     }
 
     // MARK: - Simple Persistence (JSON on disk)
-    // Keeps things beginner-friendly and avoids external deps.
 
     private var saveURL: URL {
         let fm = FileManager.default
@@ -93,7 +92,6 @@ final class PlantStore: ObservableObject {
             let decoded = try JSONDecoder().decode([Plant].self, from: data)
             self.plants = decoded
         } catch {
-            // If loading fails, start clean (don’t crash the app).
             self.plants = []
         }
     }
@@ -103,7 +101,6 @@ final class PlantStore: ObservableObject {
             let data = try JSONEncoder().encode(plants)
             try data.write(to: saveURL, options: .atomic)
         } catch {
-            // Silently ignore save errors for now (keep it simple).
         }
     }
 }

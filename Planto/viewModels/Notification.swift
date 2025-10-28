@@ -10,7 +10,6 @@ import UserNotifications
 final class Notification: NSObject, UNUserNotificationCenterDelegate {
     static let shared = Notification()
 
-    // Call once at app launch
     func requestAuthorization() {
         let center = UNUserNotificationCenter.current()
         center.delegate = self
@@ -20,16 +19,12 @@ final class Notification: NSObject, UNUserNotificationCenterDelegate {
         }
     }
 
-    // Show banner even when app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 willPresent notification: UNNotification,
                                 withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound, .list])
     }
 
-    // MARK: - Simple schedulers
-
-    /// Fire once after `seconds` (great for testing)
     func scheduleIn(seconds: TimeInterval,
                     title: String,
                     body: String,
@@ -44,7 +39,6 @@ final class Notification: NSObject, UNUserNotificationCenterDelegate {
         UNUserNotificationCenter.current().add(request)
     }
 
-    /// Fire every day at a given hour/minute (optional helper)
     func scheduleDaily(hour: Int, minute: Int,
                        title: String, body: String,
                        identifier: String = "daily.water.reminder") {
